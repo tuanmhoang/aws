@@ -1,0 +1,11 @@
+version: '2.1'
+
+services:
+  restservice-db:
+    image: postgres:11.6-alpine
+    ports:
+      - 5434:5432
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_DB=study

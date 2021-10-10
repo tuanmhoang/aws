@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeset:
+     id:  renameColumn-example  
+     author:  Tuan  
+     changes:
+     - renameColumn:     
+        columnDataType:  varchar(50)  
+        newColumnName:  start_date  
+        oldColumnName:  description  
+        remarks:  A String  
+        schemaName:  public  
+        tableName:  subscription      

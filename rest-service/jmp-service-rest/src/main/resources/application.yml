@@ -1,0 +1,15 @@
+server:
+    port: ${svport}
+spring:
+    datasource:
+        password: ${dbpassword}
+        url: {dburl}
+        username: ${dbuser}
+    jpa: 
+        hibernate:
+            hibernate:
+                ddl-auto: update
+            database-platform: ${dbplatform}
+    liquibase:
+        change-log: classpath:db/changelog/changelog-master.yml
+        enabled: true
