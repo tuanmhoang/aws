@@ -3,12 +3,11 @@ server:
 spring:
     datasource:
         password: ${dbpassword}
-        url: {dburl}
+        url: ${dburl}
         username: ${dbuser}
     jpa: 
         hibernate:
-            hibernate:
-                ddl-auto: update
+            ddl-auto: update
             database-platform: ${dbplatform}
     liquibase:
         change-log: classpath:db/changelog/changelog-master.yml
