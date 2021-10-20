@@ -1,8 +1,8 @@
-package com.tuanhm.dtos;
+package com.tuanmhoang.dtos;
 
 import java.util.List;
 
-import com.tuanhm.dtos.item.Item;
+import com.tuanmhoang.dtos.item.Item;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

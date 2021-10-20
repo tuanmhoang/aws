@@ -1,6 +1,6 @@
-package com.tuanhm.dtos.item;
+package com.tuanmhoang.dtos.item;
 
-import com.tuanhm.dtos.type.ItemType;
+import com.tuanmhoang.dtos.type.ItemType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.tuanhm.dtos.type;
+package com.tuanmhoang.dtos.type;
 
 public enum ItemType {
 	LIQUID,
