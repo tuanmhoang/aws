@@ -7,10 +7,25 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
+	<properties>
+		<lombok.version>1.18.20</lombok.version>
+	</properties>
+
 	<modules>
+		<module>dtos</module>
 		<module>log-service</module>
 		<module>order-service</module>
 		<module>process-service</module>
 	</modules>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 </project>
