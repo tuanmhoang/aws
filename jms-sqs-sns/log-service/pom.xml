@@ -7,7 +7,5 @@
 		<artifactId>jms-sqs-sns</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.tuanmhoang.orders</groupId>
 	<artifactId>log-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 </project>

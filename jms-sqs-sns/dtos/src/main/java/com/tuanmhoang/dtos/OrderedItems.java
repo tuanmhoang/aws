@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
+public class OrderedItems {
 	private Long id;
 	private List<Item> orderedItems;
 

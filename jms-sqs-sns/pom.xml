@@ -15,14 +15,16 @@
 
 	<properties>
 		<lombok.version>1.18.20</lombok.version>
-		<java.version>8</java.version>
+		<java.version>11</java.version>
 	</properties>
 
 	<modules>
 		<module>dtos</module>
-		<module>log-service</module>
-		<module>order-service</module>
+		<module>order-service-api</module>
+		<module>order-service-impl</module>
+		<module>order-service-rest</module>
 		<module>process-service</module>
+		<module>log-service</module>
 	</modules>
 
 	<dependencyManagement>
