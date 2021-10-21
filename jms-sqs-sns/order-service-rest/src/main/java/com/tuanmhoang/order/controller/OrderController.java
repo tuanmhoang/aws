@@ -1,5 +1,6 @@
 package com.tuanmhoang.order.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,12 +19,17 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 public class OrderController {
 	
 	private final OrderService order;
+	
+	@Autowired
+	public OrderController(OrderService order) {
+		this.order = order;
+	}
 
 	@PostMapping
 	@ApiOperation(value = "Order items")
 	public ResponseEntity<String> order(@RequestBody OrderedItems orderedItems) {
-		
-		return ResponseEntity.ok("hello world");
+		order.process(orderedItems);
+		return ResponseEntity.ok("order successfully");
 	}
 
 }

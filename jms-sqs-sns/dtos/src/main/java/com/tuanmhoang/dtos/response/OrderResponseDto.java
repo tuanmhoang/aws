@@ -1,4 +1,4 @@
-package com.tuanmhoang.dtos;
+package com.tuanmhoang.dtos.response;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderedItems {
+public class OrderResponseDto {
 	
 	private Long id;
 	private List<Item> orderedItems;
-
+	private String message;
 }

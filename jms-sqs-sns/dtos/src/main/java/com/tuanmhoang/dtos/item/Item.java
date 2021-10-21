@@ -16,5 +16,6 @@ public class Item {
 	private String name;
 	private ItemType type;
 	private int quantity;
+	private String description;
 
 }
