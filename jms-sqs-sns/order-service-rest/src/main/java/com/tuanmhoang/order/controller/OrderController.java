@@ -1,5 +1,7 @@
 package com.tuanmhoang.order.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +29,7 @@ public class OrderController {
 
 	@PostMapping
 	@ApiOperation(value = "Order items")
-	public ResponseEntity<String> order(@RequestBody OrderedItems orderedItems) {
+	public ResponseEntity<String> order(@RequestBody @Valid OrderedItems orderedItems) {
 		order.process(orderedItems);
 		return ResponseEntity.ok("order successfully");
 	}
