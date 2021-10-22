@@ -43,11 +43,11 @@ public class ProcessOrderService {
 
 	private void processMessagesFromOrderQueue(List<String> messages) {
 		messages.forEach(mes -> processSingleMessage(mes));
-
 	}
 
 	private void processSingleMessage(String mes) {
 		// TODO: process and send to process queue
+		// TODO: delete message after handle logic
 	}
 
 }
