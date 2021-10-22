@@ -1,0 +1,3 @@
+sqs:
+    queue:
+        name: order-standard-q

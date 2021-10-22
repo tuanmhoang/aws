@@ -3,6 +3,7 @@ package com.tuanmhoang.order.service.impl;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.services.sqs.AmazonSQS;
@@ -13,23 +14,29 @@ import com.tuanmhoang.dtos.OrderedItem;
 import com.tuanmhoang.dtos.OrderedTransaction;
 import com.tuanmhoang.order.service.OrderService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class OrderUsingSqs implements OrderService {
 
-	private static final String QUEUE_NAME = "order-standard-q";
 	private Gson gson = new Gson();
+	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+	
+	@Value("${sqs.queue.name:order-standard-q}")
+	private String processQueueName;
 	
 	@Override
 	public void process(List<OrderedItem> orderedItems) {
-		System.out.println("sending to sqs...");
+		log.info("sending to <process> QSQ...");
 		OrderedTransaction tx = createTransaction(orderedItems);
 		try {
 			String dataToSqs = gson.toJson(tx);
-			sendSqs(dataToSqs);
+			sendSqs(dataToSqs, processQueueName);
 		} catch (Exception e) {
-			System.err.println(e);
+			log.error("Cannot process data to queue... ", e);
 		}
-		System.out.println("done");
+		log.info("-- done --");
 	}
 
 	// simulate a transaction
@@ -37,13 +44,8 @@ public class OrderUsingSqs implements OrderService {
 		return new OrderedTransaction(UUID.randomUUID().toString(), orderedItems);
 	}
 
-	private void sendSqs(String dataToSqs) {
-//		final AmazonSQS sqs = AmazonSQSClientBuilder.standard()
-//		        .withRegion(Region.getRegion(Regions.US_EAST_2).getName())
-//		        .withCredentials(DefaultAWSCredentialsProviderChain.getInstance()).build();
-		
-		final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
-        String queueUrl = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl(); 
+	private void sendSqs(String dataToSqs, String queueName) {
+        String queueUrl = sqs.getQueueUrl(queueName).getQueueUrl(); 
         
         SendMessageRequest msgRequest = new SendMessageRequest()
                 .withQueueUrl(queueUrl)
