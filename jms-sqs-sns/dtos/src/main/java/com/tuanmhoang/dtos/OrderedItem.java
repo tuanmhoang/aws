@@ -1,6 +1,4 @@
-package com.tuanmhoang.dtos.item;
-
-import com.tuanmhoang.dtos.type.ItemType;
+package com.tuanmhoang.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Item {
+public class OrderedItem {
+	
 	private long id;
-	private String name;
-	private ItemType type;
 	private int quantity;
-	private String description;
+
 }

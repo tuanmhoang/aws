@@ -2,8 +2,6 @@ package com.tuanmhoang.dtos;
 
 import java.util.List;
 
-import com.tuanmhoang.dtos.item.Item;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,9 +11,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderedItems {
-	
-	private Long id;
-	private List<Item> orderedItems;
+public class OrderedTransaction {
+	private String id;
+	private List<OrderedItem> orderedItems;
 
 }

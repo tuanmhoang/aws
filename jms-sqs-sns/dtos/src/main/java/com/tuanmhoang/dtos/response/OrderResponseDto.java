@@ -1,8 +1,6 @@
 package com.tuanmhoang.dtos.response;
 
-import java.util.List;
-
-import com.tuanmhoang.dtos.item.Item;
+import com.tuanmhoang.dtos.OrderedItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +14,6 @@ import lombok.Setter;
 public class OrderResponseDto {
 	
 	private Long id;
-	private List<Item> orderedItems;
+	private OrderedItem orderedItem;
 	private String message;
 }

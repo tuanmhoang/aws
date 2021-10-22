@@ -7,11 +7,11 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
-import com.tuanmhoang.dtos.OrderedItems;
+import com.tuanmhoang.dtos.OrderedItem;
 
 public class OrderItemTestUtils {
 
-	public OrderedItems createMockOrderedItems() throws IOException, URISyntaxException {
+	public OrderedItem createMockOrderedItems() throws IOException, URISyntaxException {
 //		OrderedItems orderedItems = new OrderedItems();
 //		List<Item> items = new ArrayList<>();
 //		items.add(new Item(1L, "Horilka", ItemType.LIQUID, 330, ""));
@@ -22,7 +22,7 @@ public class OrderItemTestUtils {
 				.collect(Collectors.joining());
 
 		Gson gson = new Gson();
-		OrderedItems orderedItems = gson.fromJson(json, OrderedItems.class);
+		OrderedItem orderedItems = gson.fromJson(json, OrderedItem.class);
 
 //		items.add(new Item(1L, "Horilka", ItemType.LIQUID, 330));
 //		items.add(new Item(1L, "Horilka", ItemType.LIQUID, 330));
