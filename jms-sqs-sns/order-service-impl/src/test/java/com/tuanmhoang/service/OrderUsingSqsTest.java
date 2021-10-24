@@ -2,7 +2,6 @@ package com.tuanmhoang.service;
 
 import org.junit.jupiter.api.Test;
 
-import com.tuanmhoang.dtos.OrderedItem;
 import com.tuanmhoang.order.service.impl.OrderUsingSqs;
 
 public class OrderUsingSqsTest {

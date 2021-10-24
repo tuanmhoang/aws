@@ -8,7 +8,9 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>order-service-rest</artifactId>
-
+	<properties>
+		<spring.boot.version>2.5.5</spring.boot.version>
+	</properties>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -45,37 +47,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-hateoas</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
-
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>2.1.5.RELEASE</version>
-				<configuration>
-					<mainClass>com.tuanmhoang.order.App</mainClass>
-				</configuration>
 				<executions>
 					<execution>
 						<goals>

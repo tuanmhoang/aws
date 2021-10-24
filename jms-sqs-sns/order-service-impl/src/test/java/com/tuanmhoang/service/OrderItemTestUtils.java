@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
-import com.tuanmhoang.dtos.OrderedItem;
+import com.tuanmhoang.order.dtos.OrderedItem;
 
 public class OrderItemTestUtils {
 

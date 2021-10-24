@@ -1,6 +1,6 @@
-package com.tuanmhoang.dtos.item;
+package com.tuanmhoang.order.dtos.item;
 
-import com.tuanmhoang.dtos.type.ItemType;
+import com.tuanmhoang.order.dtos.type.ItemType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +11,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Item {
-	private long id;
+public class ItemData {
+	
 	private String name;
 	private ItemType type;
-	private int quantity;
 	private String description;
+	private String imgUrl;
+	private int maxAllowed;
+
 }

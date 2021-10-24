@@ -10,8 +10,8 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.google.gson.Gson;
-import com.tuanmhoang.dtos.OrderedItem;
-import com.tuanmhoang.dtos.OrderedTransaction;
+import com.tuanmhoang.order.dtos.OrderedItem;
+import com.tuanmhoang.order.dtos.OrderedTransaction;
 import com.tuanmhoang.order.service.OrderService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +23,8 @@ public class OrderUsingSqs implements OrderService {
 	private Gson gson = new Gson();
 	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 	
-	@Value("${sqs.queue.name:order-standard-q}")
-	private String processQueueName;
+	@Value("${sqs.queue.name:order-q}")
+	private String queueName;
 	
 	@Override
 	public void process(List<OrderedItem> orderedItems) {
@@ -32,7 +32,7 @@ public class OrderUsingSqs implements OrderService {
 		OrderedTransaction tx = createTransaction(orderedItems);
 		try {
 			String dataToSqs = gson.toJson(tx);
-			sendSqs(dataToSqs, processQueueName);
+			sendSqs(dataToSqs, queueName);
 		} catch (Exception e) {
 			log.error("Cannot process data to queue... ", e);
 		}

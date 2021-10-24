@@ -1,0 +1,114 @@
+{
+	"items": [
+		{
+			"id": 1,
+			"data": {
+				"name": "Horilka",
+				"type": "LIQUID",
+				"description": "Horilka is a Ukrainian alcoholic beverage. The word horilka may also be used in a generic sense in the Ukrainian language to mean vodka or other strong spirits and etymologically is similar to the Ukrainian word for burning - hority.",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/de/2/21/Ukrainischer_horilka.jpg",
+				"maxAllowed": 1000
+			}
+		},
+		{
+			"id": 2,
+			"data": {
+				"name": "Varenyky",
+				"type": "LIQUID",
+				"description": "Varenyky are popular Ukrainian dumplings filled with a variety of ingredients such as vegetables, meat, cheese, sauerkraut, eggs, mushrooms, and even fruit.",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/0/06/2018-07-03_Pierogi_ruskie_ze_skwarkami.jpg",
+				"maxAllowed": 500
+			}
+		},
+		{
+			"id": 3,
+			"data": {
+				"name": "Holubtsi",
+				"type": "COUNTABLE",
+				"description": "Holubtsi are traditional Ukrainian cabbage rolls, especially beloved in the Carpathians.",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/Holubtsi.jpg",
+				"maxAllowed": 10
+			}
+		},
+		{
+			"id": 4,
+			"data" : {
+				"name": "Chicken Kyiv",
+				"type": "COUNTABLE",	
+				"description": "Chicken Kiev is a dish made of chicken fillet pounded and rolled around cold butter, then coated with eggs and bread crumbs, and either fried or baked.",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Chicken_Kiev_in_Kiev_%28cropped%29.jpg",
+				"maxAllowed": 10
+			}
+		},
+		{
+			"id": 5,
+			"data" : {
+				"name": "Com tam",
+				"type": "COUNTABLE",
+				"description": "Rice with pork, eggs, familiar in Vietnam",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Com-Tam-2008.jpg",
+				"maxAllowed": 5
+			}
+		},
+		{
+			"id": 6,
+			"data": {
+				"name": "Kvass",
+				"type": "LIQUID",	
+				"description": "Kvass is a traditional fermented Slavic and Baltic beverage commonly made from rye bread.",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/2/22/Kvass_brands.jpeg",
+				"maxAllowed": 500
+			}
+		},
+		{
+			"id": 7,
+			"data": {
+				"name": "Uzvar",
+				"type": "LIQUID",
+				"description": "The uzvar is a national Ukrainian beverage, cooked with dried fruits and berries.",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/6/66/Ukrainian_uzvar.jpg",
+				"maxAllowed": 1000
+			}
+		},
+		{
+			"id": 8,
+			"data": {
+				"name": "Sugar cane juice",
+				"type": "LIQUID",
+				"description": "If you want a sweet drink, go for it!",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Sugarcane_juice.jpg",
+				"maxAllowed": 500
+			}
+		},
+		{
+			"id": 9,
+			"data": {
+				"name": "Coffee",
+				"type": "LIQUID",
+				"description": "You're not gonna feel sleepy!",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/4/45/A_small_cup_of_coffee.JPG",
+				"maxAllowed": 300
+			}
+		},
+		{
+			"id": 10,
+			"data": {
+				"name": "Bun bo",
+				"type": "COUNTABLE",
+				"description": "Vietnamese rice noodle with beef",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/0/00/Bun-Bo-Hue-from-Huong-Giang-2011.jpg",
+				"maxAllowed": 5
+			}
+		},
+		{
+			"id": 11,
+			"data": {
+				"name": "Cha gio",
+				"type": "COUNTABLE",
+				"description": "Vietnamese traditional food.",
+				"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Cha_gio_re.jpg",
+				"maxAllowed": 10
+			}
+		}
+	]
+}

@@ -21,7 +21,7 @@ function App() {
 
   const handleOrderNow = () => {
     console.log('-----------------------------------------')
-    console.log('Data to send: ', JSON.stringify(cart))
+    console.log('Sending data: ', JSON.stringify(cart))
     fetch('http://localhost:9090/v1/order', {
       method: 'POST',
       headers: {

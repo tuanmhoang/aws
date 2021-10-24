@@ -1,6 +1,6 @@
-package com.tuanmhoang.dtos.response;
+package com.tuanmhoang.order.dtos.response;
 
-import com.tuanmhoang.dtos.OrderedItem;
+import com.tuanmhoang.order.dtos.OrderedItem;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
