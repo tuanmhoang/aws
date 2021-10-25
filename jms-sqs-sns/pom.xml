@@ -39,7 +39,6 @@
 				<artifactId>gson</artifactId>
 				<version>${gson.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-sqs</artifactId>

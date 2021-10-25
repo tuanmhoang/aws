@@ -72,7 +72,6 @@ public class ProcessOrderService {
 	}
 
 	private void processSingleMessage(String mes) {
-		// TODO: process and send to process queue
 		// should handle some exceptions about not existing id, etc. but to keep it
 		// simple, lets skip these.
 		OrderedTransaction orderedTransaction = gson.fromJson(mes, OrderedTransaction.class);
