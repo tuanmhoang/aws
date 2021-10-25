@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Item {
-	private long id;
+	private int id;
 	private ItemData data;
 
 }

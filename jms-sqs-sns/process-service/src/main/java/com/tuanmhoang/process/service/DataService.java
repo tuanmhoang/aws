@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DataService {
 	
 	private Gson gson = new Gson();
-	private Map<Long, ItemData> appData = new HashMap<>();
+	private Map<Integer, ItemData> appData = new HashMap<>();
 	
 	public DataService() throws IOException {
 		String jsonData = loadData();
@@ -39,11 +39,11 @@ public class DataService {
 		return text;
 	}
 
-	public Map<Long, ItemData> getAppData() {
+	public Map<Integer, ItemData> getAppData() {
 		return appData;
 	}
 
-	public void setAppData(Map<Long, ItemData> appData) {
+	public void setAppData(Map<Integer, ItemData> appData) {
 		this.appData = appData;
 	}
 

@@ -1,5 +1,6 @@
 package com.tuanmhoang.process.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,10 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.sns.AmazonSNS;
+import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.MessageAttributeValue;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
 import com.google.gson.Gson;
+import com.tuanmhoang.order.dtos.OrderedTransaction;
 import com.tuanmhoang.order.dtos.item.ItemData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,36 +32,33 @@ public class ProcessOrderService {
 	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 	private final DataService dataService;
 	private Gson gson = new Gson();
-	
-	private Map<Long, ItemData> appData;
-	
-	@Value("${sqs.queue.name:process-q}")
-	private String queueName;
+
+	private Map<Integer, ItemData> appData;
+	private static final String TOPIC_ARN = "arn:aws:sns:us-east-2:054147756359:processed-order";
 
 	@Autowired
 	public ProcessOrderService(DataService dataService) {
 		this.dataService = dataService;
 		log.info("... Getting app data ...");
-		this.appData = dataService.getAppData();
+		loadAppData();
 	}
 
-	@Value("${sqs.queue.name:order-standard-q}")
+	@Value("${sqs.queue.name:order-q}")
 	private String orderQueueName;
-
-	@Value("${sqs.queue.name:order-result-q}")
-	private String processQueueName;
 
 	public void checkForQueueAndProcess() {
 		// receive messages from the queue
 		log.info("receiving messages from queue");
 		List<String> messages = getMessagesFromOrderQueue();
 		if (messages.size() > 0) {
-//			log.info("Getting app data");
-//			appData = dataService.getAppData();
 			processMessagesFromOrderQueue(messages);
 		} else {
 			log.info("There is no new message from queue");
 		}
+	}
+
+	private void loadAppData() {
+		this.appData = dataService.getAppData();
 	}
 
 	private List<String> getMessagesFromOrderQueue() {
@@ -68,11 +75,48 @@ public class ProcessOrderService {
 		// TODO: process and send to process queue
 		// should handle some exceptions about not existing id, etc. but to keep it
 		// simple, lets skip these.
-		gson.fromJson(mes, null);
+		OrderedTransaction orderedTransaction = gson.fromJson(mes, OrderedTransaction.class);
+		orderedTransaction.getOrderedItems()
+				.forEach(item -> processSingleItem(orderedTransaction.getId(), item.getId(), item.getQuantity()));
 		// TODO: delete message after handle logic
 	}
 
-	public Map<Long, ItemData> getAppData() {
+	private void processSingleItem(String txId, int itemId, int quantity) {
+		int maxAllowed = appData.get(itemId).getMaxAllowed();
+		String message = null;
+		String subject = null;
+		if (quantity > maxAllowed) {
+			subject = "Rejected";
+			message = String.format("TxId: %s - itemID: %d - The ordered items is more than the allowed number %s.", txId, itemId, maxAllowed);
+		} else {
+			subject = "Accepted";
+			message = String.format("TxId: %s - itemID: %d - The items is ordered successfully.", txId, itemId);
+		}
+		sendToSns(subject, message);
+	}
+
+	private void sendToSns(String subject, String message) {
+		PublishRequest request = new PublishRequest(TOPIC_ARN, message, subject);
+		Map<String, MessageAttributeValue> mgsAttrMap = new HashMap<>();
+		
+		MessageAttributeValue mgsAttr = new MessageAttributeValue();
+		mgsAttr.setDataType("String");
+		mgsAttr.setStringValue(subject.toLowerCase());
+		mgsAttrMap.put("order_status", mgsAttr);
+		request.setMessageAttributes(mgsAttrMap);
+		
+		AmazonSNS snsClient = AmazonSNSClient.builder()
+				.withRegion(Region.getRegion(Regions.US_EAST_2).getName())
+				.withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
+				.build();
+
+		PublishResult result = snsClient.publish(request);
+		log.info(result.getMessageId() + " Message sent. Status is " + result.getSdkHttpMetadata().getHttpStatusCode());
+		log.info("done sending");
+
+	}
+
+	public Map<Integer, ItemData> getAppData() {
 		return appData;
 	}
 
