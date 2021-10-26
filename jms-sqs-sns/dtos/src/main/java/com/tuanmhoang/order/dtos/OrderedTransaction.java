@@ -14,5 +14,4 @@ import lombok.Setter;
 public class OrderedTransaction {
 	private String id;
 	private List<OrderedItem> orderedItems;
-
 }

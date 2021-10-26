@@ -23,7 +23,7 @@ public class ScheduledTasks {
 		this.processService = processService;
 	}
 
-	@Scheduled(fixedRate = 100000000)
+	@Scheduled(fixedRate = 20000)
 	public void cronJobToCheckOrderQueue() {
 		log.info("The time is now {}", dateFormat.format(new Date()));
 		processService.checkForQueueAndProcess();
