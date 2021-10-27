@@ -1,5 +1,8 @@
 package com.tuanmhoang.process.service;
 
+import com.amazonaws.services.sns.model.AmazonSNSException;
+import com.amazonaws.services.sns.model.CreateTopicRequest;
+import com.amazonaws.services.sns.model.CreateTopicResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ProcessOrderService {
-    final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+    private final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+
+    private final AmazonSNS snsClient = AmazonSNSClient.builder()
+        .withRegion(Region.getRegion(Regions.US_EAST_2).getName())
+        .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
+        .build();
 
     private final DataService dataService;
 
@@ -37,7 +45,8 @@ public class ProcessOrderService {
 
     private Map<Integer, ItemData> appData;
 
-    private static final String TOPIC_ARN = "arn:aws:sns:us-east-2:054147756359:processed-order";
+    @Value("${sns.topic.process.name:processed-order}")
+    private String topicName;
 
     @Autowired
     public ProcessOrderService(DataService dataService) {
@@ -54,7 +63,7 @@ public class ProcessOrderService {
         log.info("receiving messages from queue");
         String queueUrl = sqs.getQueueUrl(orderQueueName).getQueueUrl();
         List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
-        List<String> messagesAsString = messages.stream().map(mes -> mes.getBody().toString()).collect(Collectors.toList());
+        List<String> messagesAsString = messages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
 
         if (messages.size() > 0) {
             processMessagesFromOrderQueue(messagesAsString);
@@ -68,13 +77,14 @@ public class ProcessOrderService {
         }
     }
 
-    private void loadAppData() {
-        this.appData = dataService.getAppData();
+    private String getSnsTopicArnByTopicName(String topicName) throws AmazonSNSException {
+        CreateTopicRequest request = new CreateTopicRequest(topicName);
+        CreateTopicResult result = snsClient.createTopic(request);
+        return result.getTopicArn();
     }
 
-    private List<Message> getMessagesFromOrderQueue() {
-        String queueUrl = sqs.getQueueUrl(orderQueueName).getQueueUrl();
-        return sqs.receiveMessage(queueUrl).getMessages();
+    private void loadAppData() {
+        this.appData = dataService.getAppData();
     }
 
     private void processMessagesFromOrderQueue(List<String> messages) {
@@ -87,7 +97,6 @@ public class ProcessOrderService {
         OrderedTransaction orderedTransaction = gson.fromJson(mes, OrderedTransaction.class);
         orderedTransaction.getOrderedItems()
             .forEach(item -> processSingleItem(orderedTransaction.getId(), item.getId(), item.getQuantity()));
-        // TODO: delete message after handle logic
     }
 
     private void processSingleItem(String txId, int itemId, int quantity) {
@@ -107,7 +116,7 @@ public class ProcessOrderService {
     }
 
     private void sendToSns(String subject, String message) {
-        PublishRequest request = new PublishRequest(TOPIC_ARN, message, subject);
+        PublishRequest request = new PublishRequest(getSnsTopicArnByTopicName(topicName), message, subject);
         Map<String, MessageAttributeValue> mgsAttrMap = new HashMap<>();
 
         MessageAttributeValue mgsAttr = new MessageAttributeValue();
@@ -115,11 +124,6 @@ public class ProcessOrderService {
         mgsAttr.setStringValue(subject.toLowerCase());
         mgsAttrMap.put("order_status", mgsAttr);
         request.setMessageAttributes(mgsAttrMap);
-
-        AmazonSNS snsClient = AmazonSNSClient.builder()
-            .withRegion(Region.getRegion(Regions.US_EAST_2).getName())
-            .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-            .build();
 
         PublishResult result = snsClient.publish(request);
         log.info(result.getMessageId() + " Message sent. Status is " + result.getSdkHttpMetadata().getHttpStatusCode());

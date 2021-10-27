@@ -48,23 +48,21 @@ public class LogService {
     private String rejectedDir;
 
     public void checkForQueueAndProcess() {
-        // TODO check for messages on queue
         log.info("receiving messages from queue");
-//        List<String> messagesFromAcceptedQueue = getMessagesFromQueue(acceptedQueueName);
-//        List<String> messagesFromRejectedQueue = getMessagesFromQueue(rejectedQueueName);
+
         String acceptedQueueUrl = sqsClient.getQueueUrl(acceptedQueueName).getQueueUrl();
         List<Message> acceptedMessages = sqsClient.receiveMessage(acceptedQueueUrl).getMessages();
-        List<String> messagesFromAcceptedQueue = acceptedMessages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
 
         String rejectedQueueUrl = sqsClient.getQueueUrl(rejectedQueueName).getQueueUrl();
         List<Message> rejectedMessages = sqsClient.receiveMessage(rejectedQueueUrl).getMessages();
-        List<String> messagesFromRejectedQueue = rejectedMessages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
 
         // process message, write log
-        if (CollectionUtils.isEmpty(messagesFromAcceptedQueue) && CollectionUtils.isEmpty(messagesFromRejectedQueue)) {
+        if (CollectionUtils.isEmpty(acceptedMessages) && CollectionUtils.isEmpty(rejectedMessages)) {
             log.info("There is no new message from queue");
         } else {
-            if (!CollectionUtils.isEmpty(messagesFromAcceptedQueue)) {
+            // check for accepted messages
+            if (!CollectionUtils.isEmpty(acceptedMessages)) {
+                List<String> messagesFromAcceptedQueue = acceptedMessages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
                 log.info("Processing messagesFromAcceptedQueue...");
                 processMessagesFromAcceptedQueue(messagesFromAcceptedQueue);
                 log.info("Done processing messagesFromAcceptedQueue - Deleting messages...");
@@ -74,7 +72,10 @@ public class LogService {
                     log.info("Deleted message << {} >> with statusCode: {} ", m.getBody(), statusCode);
                 }
             }
-            if (!CollectionUtils.isEmpty(messagesFromRejectedQueue)) {
+
+            // check for rejected messages
+            if (!CollectionUtils.isEmpty(rejectedMessages)) {
+                List<String> messagesFromRejectedQueue = rejectedMessages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
                 log.info("Processing messagesFromRejectedQueue...");
                 processMessagesFromRejectedQueue(messagesFromRejectedQueue);
                 log.info("Done processing messagesFromRejectedQueue - Deleting messages...");
@@ -84,10 +85,7 @@ public class LogService {
                     log.info("Deleted message << {} >> with statusCode: {} ", m.getBody(), statusCode);
                 }
             }
-
         }
-        // delete the processed message
-
     }
 
     private List<String> getMessagesFromQueue(String queueName) {
@@ -109,7 +107,7 @@ public class LogService {
         String reportFileName = buildReportFileName(type);
         // build message to write
         StringBuilder msgToWriteBuilder = new StringBuilder();
-        for (String msg : messagesFromQueue) {// TODO
+        for (String msg : messagesFromQueue) {
             //log.info("Processing message: {}", msg);
             JSONObject jsonObject = new JSONObject(msg);
             msgToWriteBuilder.append(buildMessageToWrite(jsonObject));
@@ -147,7 +145,6 @@ public class LogService {
         }
     }
 
-    // https://stackoverflow.com/questions/28568635/read-aws-s3-file-to-java-code
     @NotNull
     private String buildMessageToWrite(JSONObject jsonObject) {
         StringBuilder messageBuilder = new StringBuilder();

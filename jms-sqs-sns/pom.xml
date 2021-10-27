@@ -25,7 +25,8 @@
 		<module>order-service-rest</module>
 		<module>process-service</module>
 		<module>log-service</module>
-	</modules>
+        <module>notification-service</module>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>

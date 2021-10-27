@@ -8,7 +8,7 @@ First application read the following order details from console and send it to t
     Number of items for countable items;
     Order total.
 
-Second application should process orders with the following rules:
+Second application should notification orders with the following rules:
 
     If order total greater than some threshold - order should be rejected;
     If already ordered more than N liters - the order should be rejected;

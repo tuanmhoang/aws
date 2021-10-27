@@ -28,7 +28,7 @@ public class OrderUsingSqs implements OrderService {
 	
 	@Override
 	public void process(List<OrderedItem> orderedItems) {
-		log.info("sending to <process> QSQ...");
+		log.info("sending to <process> SQS...");
 		OrderedTransaction tx = createTransaction(orderedItems);
 		try {
 			String dataToSqs = gson.toJson(tx);
