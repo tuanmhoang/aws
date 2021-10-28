@@ -30,6 +30,4 @@ public class OrderController {
 		orderService.process(orderedItems);
 		return ResponseEntity.ok("order successfully");
 	}
-
-	
 }

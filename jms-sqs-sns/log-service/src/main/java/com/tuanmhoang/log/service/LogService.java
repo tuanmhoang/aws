@@ -33,19 +33,19 @@ public class LogService {
 
     private static final String HYPHEN = "_";
 
-    @Value("${sqs.queue.name:accepted-order-q}")
+    @Value("${sqs.queue.order.accepted.name:accepted-order-q}")
     private String acceptedQueueName;
 
-    @Value("${sqs.queue.name:rejected-order-q}")
+    @Value("${sqs.queue.order.rejected.name:rejected-order-q}")
     private String rejectedQueueName;
 
-    @Value("${sqs.queue.name:items-order-bucket}")
+    @Value("${s3.bucket.order.name:items-order-bucket}")
     private String bucketName;
 
-    @Value("${sqs.queue.name:accepted}")
+    @Value("${s3.directory.accepted.name:accepted}")
     private String acceptedDir;
 
-    @Value("${sqs.queue.name:rejected}")
+    @Value("${s3.directory.rejected.name:rejected}")
     private String rejectedDir;
 
     private String bucketDirLocation;
@@ -56,33 +56,34 @@ public class LogService {
         log.info("receiving messages from queue");
 
         String acceptedQueueUrl = sqsClient.getQueueUrl(acceptedQueueName).getQueueUrl();
-        List<Message> acceptedMessages = sqsClient.receiveMessage(acceptedQueueUrl).getMessages();
+        var acceptedMessages = sqsClient.receiveMessage(acceptedQueueUrl).getMessages();
 
         String rejectedQueueUrl = sqsClient.getQueueUrl(rejectedQueueName).getQueueUrl();
-        List<Message> rejectedMessages = sqsClient.receiveMessage(rejectedQueueUrl).getMessages();
+        var rejectedMessages = sqsClient.receiveMessage(rejectedQueueUrl).getMessages();
 
         // check for accepted messages
-        if (!CollectionUtils.isEmpty(acceptedMessages)) {
+        if (CollectionUtils.isEmpty(acceptedMessages)) {
+            log.info("There is no new message from {}", acceptedQueueName);
+        } else {
             log.info("Processing data from {}", acceptedQueueName);
             this.withProcessedOrderType(ProcessedOrderType.ACCEPTED)
                 .processMessages(acceptedQueueUrl, acceptedMessages);
-        } else {
-            log.info("There is no new message from {}", acceptedQueueName);
         }
 
         // check for rejected messages
-        if (!CollectionUtils.isEmpty(rejectedMessages)) {
+        if (CollectionUtils.isEmpty(rejectedMessages)) {
+            log.info("There is no new message from {}", rejectedQueueName);
+        } else {
             log.info("Processing data from {}", rejectedQueueName);
             this.withProcessedOrderType(ProcessedOrderType.REJECTED)
                 .processMessages(rejectedQueueUrl, rejectedMessages);
-        } else {
-            log.info("There is no new message from {}", rejectedQueueName);
         }
     }
 
     private void processMessages(String queueUrl, List<Message> messages) {
         List<String> messagesFromQueue = messages.stream()
-            .map(mes -> mes.getBody()).collect(Collectors.toList());
+            .map(Message::getBody)
+            .collect(Collectors.toList());
         log.info("Processing messagesFromAcceptedQueue...");
         processMessagesFromQueue(messagesFromQueue);
         log.info("Done processing messagesFromAcceptedQueue - Deleting messages...");
@@ -114,15 +115,21 @@ public class LogService {
         log.info("msgToWrite : {}", msgToWrite);
 
         try {
-            String dataFromS3Obj = s3Client.getObjectAsString(bucketDirLocation, reportFileName);
-            log.info("dataFromS3Obj: " + dataFromS3Obj);
+            var dataFromS3Obj = s3Client.getObjectAsString(bucketDirLocation, reportFileName);
+            log.info("dataFromS3Obj: {}", dataFromS3Obj);
             StringBuilder dataBuilder = new StringBuilder(dataFromS3Obj);
             dataBuilder.append(msgToWrite);
-            String dataToWrite = dataBuilder.toString();
-            s3Client.putObject(bucketDirLocation, reportFileName, dataToWrite);
+            s3Client.putObject(bucketDirLocation,
+                reportFileName,
+                dataBuilder.toString()
+            );
+
         } catch (AmazonS3Exception e) {
-            log.error("Error while get object in directory: {} with fileName: {}, with exception {}", bucketDirLocation, reportFileName,
-                e.getMessage());
+            log.error("Error while get object in directory: {} with fileName: {}, with exception {}",
+                bucketDirLocation,
+                reportFileName,
+                e.getMessage()
+            );
             if (e.getStatusCode() == HttpStatus.SC_NOT_FOUND) { // file not exists
                 log.info("Init putting s3Object...");
                 try {
@@ -133,11 +140,13 @@ public class LogService {
                 } catch (AmazonServiceException ase) {
                     // The call was transmitted successfully, but Amazon S3 couldn't process
                     // it, so it returned an error response.
-                    ase.printStackTrace();
+                    log.error("Error while process S3",
+                        ase);
                 } catch (SdkClientException sdke) {
                     // Amazon S3 couldn't be contacted for a response, or the client
                     // couldn't parse the response from Amazon S3.
-                    sdke.printStackTrace();
+                    log.error("Error while process S3",
+                        sdke);
                 }
             }
         }

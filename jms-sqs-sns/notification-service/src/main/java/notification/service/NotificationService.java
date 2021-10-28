@@ -33,9 +33,6 @@ public class NotificationService {
     private String topicName;
 
     public void checkForQueueAndProcess() {
-
-        String topicArn = getSnsTopicArnByTopicName(topicName);
-
         // receive messages from the orderAcceptedQueue
         processMessages(orderAcceptedQueueName);
 
@@ -43,7 +40,7 @@ public class NotificationService {
         processMessages(orderRejectedQueueName);
     }
 
-    private String getSnsTopicArnByTopicName(String topicName) throws AmazonSNSException {
+    private String getSnsTopicArn() throws AmazonSNSException {
         CreateTopicRequest request = new CreateTopicRequest(topicName);
         CreateTopicResult result = snsClient.createTopic(request);
         return result.getTopicArn();
@@ -52,8 +49,10 @@ public class NotificationService {
     private void processMessages(String queueName) {
         log.info("Receiving messages from {}", queueName);
         String queueUrl = sqs.getQueueUrl(queueName).getQueueUrl();
-        List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
-        if (messages.size() > 0) {
+        var messages = sqs.receiveMessage(queueUrl).getMessages();
+        if (messages.isEmpty()) {
+            log.info("There is no new message from {}", queueName);
+        } else {
             List<String> messagesAsString = messages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
             processMessagesFromOrderQueue(messagesAsString);
             log.info("finish processing all the messages from {}", queueName);
@@ -61,8 +60,6 @@ public class NotificationService {
             for (Message m : messages) {
                 sqs.deleteMessage(queueUrl, m.getReceiptHandle());
             }
-        } else {
-            log.info("There is no new message from {}", queueName);
         }
     }
 
@@ -71,9 +68,13 @@ public class NotificationService {
     }
 
     private void processSingleMessage(String message) {
-        PublishRequest request = new PublishRequest(getSnsTopicArnByTopicName(topicName), message, "Order process completed");
+        PublishRequest request = new PublishRequest(getSnsTopicArn(),
+            message,
+            "Order process completed");
         PublishResult result = snsClient.publish(request);
-        log.info(result.getMessageId() + " Message sent. Status is " + result.getSdkHttpMetadata().getHttpStatusCode());
+        log.info("MessageId {} - Message sent. Status is {}",
+            result.getMessageId(),
+            result.getSdkHttpMetadata().getHttpStatusCode());
         log.info("done sending");
     }
 
