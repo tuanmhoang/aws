@@ -75,7 +75,5 @@ public class NotificationService {
         log.info("MessageId {} - Message sent. Status is {}",
             result.getMessageId(),
             result.getSdkHttpMetadata().getHttpStatusCode());
-        log.info("done sending");
     }
-
 }

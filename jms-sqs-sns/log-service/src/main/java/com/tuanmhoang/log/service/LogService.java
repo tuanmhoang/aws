@@ -68,6 +68,7 @@ public class LogService {
             log.info("Processing data from {}", acceptedQueueName);
             this.withProcessedOrderType(ProcessedOrderType.ACCEPTED)
                 .processMessages(acceptedQueueUrl, acceptedMessages);
+            log.info("Finish processing data from {}", acceptedQueueName);
         }
 
         // check for rejected messages
@@ -77,6 +78,7 @@ public class LogService {
             log.info("Processing data from {}", rejectedQueueName);
             this.withProcessedOrderType(ProcessedOrderType.REJECTED)
                 .processMessages(rejectedQueueUrl, rejectedMessages);
+            log.info("Finish processing data from {}", rejectedQueueName);
         }
     }
 
@@ -154,8 +156,8 @@ public class LogService {
 
     @NotNull
     private String buildMessageToWrite(JSONObject jsonObject) {
-        StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append(jsonObject.getString("Timestamp"))
+        StringBuilder messageBuilder = new StringBuilder(jsonObject.getString("Timestamp"));
+        messageBuilder
             .append(HYPHEN).append(HYPHEN).append(HYPHEN)
             .append(jsonObject.getString("Message"))
             .append("\n");
