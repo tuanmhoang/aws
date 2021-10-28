@@ -1,13 +1,12 @@
 package notification.service;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.AmazonSNSException;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
+import com.amazonaws.services.sns.model.PublishRequest;
+import com.amazonaws.services.sns.model.PublishResult;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
@@ -22,10 +21,7 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
     private final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 
-    private final AmazonSNS snsClient = AmazonSNSClient.builder()
-        .withRegion(Region.getRegion(Regions.US_EAST_2).getName())
-        .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-        .build();
+    private final AmazonSNS snsClient = AmazonSNSClientBuilder.defaultClient();
 
     @Value("${sqs.queue.name.order.accepted:order-accepted-notification-q}")
     private String orderAcceptedQueueName;
@@ -41,10 +37,10 @@ public class NotificationService {
         String topicArn = getSnsTopicArnByTopicName(topicName);
 
         // receive messages from the orderAcceptedQueue
-        processMessagesFromQueue(orderAcceptedQueueName);
+        processMessages(orderAcceptedQueueName);
 
         // receive messages from the orderRejectedQueue
-        processMessagesFromQueue(orderRejectedQueueName);
+        processMessages(orderRejectedQueueName);
     }
 
     private String getSnsTopicArnByTopicName(String topicName) throws AmazonSNSException {
@@ -53,7 +49,7 @@ public class NotificationService {
         return result.getTopicArn();
     }
 
-    private void processMessagesFromQueue(String queueName) {
+    private void processMessages(String queueName) {
         log.info("Receiving messages from {}", queueName);
         String queueUrl = sqs.getQueueUrl(queueName).getQueueUrl();
         List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
@@ -74,7 +70,11 @@ public class NotificationService {
         messages.forEach(mes -> processSingleMessage(mes));
     }
 
-    private void processSingleMessage(String mes) {
+    private void processSingleMessage(String message) {
+        PublishRequest request = new PublishRequest(getSnsTopicArnByTopicName(topicName), message, "Order process completed");
+        PublishResult result = snsClient.publish(request);
+        log.info(result.getMessageId() + " Message sent. Status is " + result.getSdkHttpMetadata().getHttpStatusCode());
+        log.info("done sending");
     }
 
 }

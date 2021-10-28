@@ -1,4 +1,4 @@
-package com.tuanmhoang.log.fileextension;
+package com.tuanmhoang.log.enums;
 
 public enum FileExtension {
 	TXT(".txt");

@@ -9,7 +9,8 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.DeleteMessageResult;
 import com.amazonaws.services.sqs.model.Message;
-import com.tuanmhoang.log.fileextension.FileExtension;
+import com.tuanmhoang.log.enums.FileExtension;
+import com.tuanmhoang.log.enums.ProcessedOrderType;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,10 @@ public class LogService {
     @Value("${sqs.queue.name:rejected}")
     private String rejectedDir;
 
+    private String bucketDirLocation;
+
+    private String reportFileSuffix;
+
     public void checkForQueueAndProcess() {
         log.info("receiving messages from queue");
 
@@ -56,55 +61,48 @@ public class LogService {
         String rejectedQueueUrl = sqsClient.getQueueUrl(rejectedQueueName).getQueueUrl();
         List<Message> rejectedMessages = sqsClient.receiveMessage(rejectedQueueUrl).getMessages();
 
-        // process message, write log
-        if (CollectionUtils.isEmpty(acceptedMessages) && CollectionUtils.isEmpty(rejectedMessages)) {
-            log.info("There is no new message from queue");
+        // check for accepted messages
+        if (!CollectionUtils.isEmpty(acceptedMessages)) {
+            log.info("Processing data from {}", acceptedQueueName);
+            this.withProcessedOrderType(ProcessedOrderType.ACCEPTED)
+                .processMessages(acceptedQueueUrl, acceptedMessages);
         } else {
-            // check for accepted messages
-            if (!CollectionUtils.isEmpty(acceptedMessages)) {
-                List<String> messagesFromAcceptedQueue = acceptedMessages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
-                log.info("Processing messagesFromAcceptedQueue...");
-                processMessagesFromAcceptedQueue(messagesFromAcceptedQueue);
-                log.info("Done processing messagesFromAcceptedQueue - Deleting messages...");
-                for (Message m : acceptedMessages) {
-                    DeleteMessageResult deleteMessageResult = sqsClient.deleteMessage(acceptedQueueUrl, m.getReceiptHandle());
-                    int statusCode = deleteMessageResult.getSdkHttpMetadata().getHttpStatusCode();
-                    log.info("Deleted message << {} >> with statusCode: {} ", m.getBody(), statusCode);
-                }
-            }
+            log.info("There is no new message from {}", acceptedQueueName);
+        }
 
-            // check for rejected messages
-            if (!CollectionUtils.isEmpty(rejectedMessages)) {
-                List<String> messagesFromRejectedQueue = rejectedMessages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
-                log.info("Processing messagesFromRejectedQueue...");
-                processMessagesFromRejectedQueue(messagesFromRejectedQueue);
-                log.info("Done processing messagesFromRejectedQueue - Deleting messages...");
-                for (Message m : rejectedMessages) {
-                    DeleteMessageResult deleteMessageResult = sqsClient.deleteMessage(rejectedQueueUrl, m.getReceiptHandle());
-                    int statusCode = deleteMessageResult.getSdkHttpMetadata().getHttpStatusCode();
-                    log.info("Deleted message << {} >> with statusCode: {} ", m.getBody(), statusCode);
-                }
-            }
+        // check for rejected messages
+        if (!CollectionUtils.isEmpty(rejectedMessages)) {
+            log.info("Processing data from {}", rejectedQueueName);
+            this.withProcessedOrderType(ProcessedOrderType.REJECTED)
+                .processMessages(rejectedQueueUrl, rejectedMessages);
+        } else {
+            log.info("There is no new message from {}", rejectedQueueName);
         }
     }
 
-    private List<String> getMessagesFromQueue(String queueName) {
-        String queueUrl = sqsClient.getQueueUrl(queueName).getQueueUrl();
-        List<Message> messages = sqsClient.receiveMessage(queueUrl).getMessages();
-        return messages.stream().map(mes -> mes.getBody().toString()).collect(Collectors.toList());
+    private void processMessages(String queueUrl, List<Message> messages) {
+        List<String> messagesFromQueue = messages.stream()
+            .map(mes -> mes.getBody()).collect(Collectors.toList());
+        log.info("Processing messagesFromAcceptedQueue...");
+        processMessagesFromQueue(messagesFromQueue);
+        log.info("Done processing messagesFromAcceptedQueue - Deleting messages...");
+        for (Message m : messages) {
+            DeleteMessageResult deleteMessageResult = sqsClient.deleteMessage(queueUrl, m.getReceiptHandle());
+            int statusCode = deleteMessageResult.getSdkHttpMetadata().getHttpStatusCode();
+            log.info("Deleted message << {} >> with statusCode: {} ", m.getBody(), statusCode);
+        }
     }
 
-    private void processMessagesFromAcceptedQueue(List<String> messagesFromAcceptedQueue) {
-        processMessagesFromQueue(bucketName + "/" + acceptedDir, messagesFromAcceptedQueue, "accepted");
+    private LogService withProcessedOrderType(ProcessedOrderType type) {
+        String processedTypeName = type.getProcessedType();
+        this.bucketDirLocation = bucketName + "/" + processedTypeName;
+        this.reportFileSuffix = processedTypeName;
+        return this;
     }
 
-    private void processMessagesFromRejectedQueue(List<String> messagesFromRejectedQueue) {
-        processMessagesFromQueue(bucketName + "/" + rejectedDir, messagesFromRejectedQueue, "rejected");
-    }
-
-    private void processMessagesFromQueue(String bucketDirLocation, List<String> messagesFromQueue, String type) {
+    private void processMessagesFromQueue(List<String> messagesFromQueue) {
         // build file name
-        String reportFileName = buildReportFileName(type);
+        String reportFileName = buildReportFileName(this.reportFileSuffix);
         // build message to write
         StringBuilder msgToWriteBuilder = new StringBuilder();
         for (String msg : messagesFromQueue) {

@@ -1,5 +1,6 @@
 package com.tuanmhoang.process.service;
 
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.AmazonSNSException;
 import com.amazonaws.services.sns.model.CreateTopicRequest;
 import com.amazonaws.services.sns.model.CreateTopicResult;
@@ -12,11 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNS;
-import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.model.MessageAttributeValue;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
@@ -32,12 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ProcessOrderService {
-    private final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+    private final AmazonSQS sqsClient = AmazonSQSClientBuilder.defaultClient();
 
-    private final AmazonSNS snsClient = AmazonSNSClient.builder()
-        .withRegion(Region.getRegion(Regions.US_EAST_2).getName())
-        .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-        .build();
+    private final AmazonSNS snsClient = AmazonSNSClientBuilder.defaultClient();
+//        AmazonSNSClient.builder()
+//        .withRegion(Region.getRegion(Regions.US_EAST_2).getName())
+//        .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
+//        .build();
 
     private final DataService dataService;
 
@@ -61,8 +59,8 @@ public class ProcessOrderService {
     public void checkForQueueAndProcess() {
         // receive messages from the queue
         log.info("receiving messages from queue");
-        String queueUrl = sqs.getQueueUrl(orderQueueName).getQueueUrl();
-        List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
+        String queueUrl = sqsClient.getQueueUrl(orderQueueName).getQueueUrl();
+        List<Message> messages = sqsClient.receiveMessage(queueUrl).getMessages();
         List<String> messagesAsString = messages.stream().map(mes -> mes.getBody()).collect(Collectors.toList());
 
         if (messages.size() > 0) {
@@ -70,7 +68,7 @@ public class ProcessOrderService {
             log.info("finish processing all the messages");
             // delete messages after process
             for (Message m : messages) {
-                sqs.deleteMessage(queueUrl, m.getReceiptHandle());
+                sqsClient.deleteMessage(queueUrl, m.getReceiptHandle());
             }
         } else {
             log.info("There is no new message from queue");
@@ -117,8 +115,8 @@ public class ProcessOrderService {
 
     private void sendToSns(String subject, String message) {
         PublishRequest request = new PublishRequest(getSnsTopicArnByTopicName(topicName), message, subject);
-        Map<String, MessageAttributeValue> mgsAttrMap = new HashMap<>();
 
+        Map<String, MessageAttributeValue> mgsAttrMap = new HashMap<>();
         MessageAttributeValue mgsAttr = new MessageAttributeValue();
         mgsAttr.setDataType("String");
         mgsAttr.setStringValue(subject.toLowerCase());
