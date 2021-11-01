@@ -1,0 +1,10 @@
+server:
+  port: 9091
+sns:
+  topic:
+    process:
+      name: processed-order
+sqs:
+  queue:
+    order:
+      name: order-q

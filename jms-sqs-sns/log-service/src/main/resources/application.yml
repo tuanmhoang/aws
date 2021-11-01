@@ -1,0 +1,18 @@
+server:
+  port: 9092
+sqs:
+  queue:
+    order:
+      accepted:
+        name: accepted-order-q
+      rejected:
+        name: rejected-order-q
+s3:
+  bucket:
+    order:
+      name: items-order-bucket
+  directory:
+    accepted:
+      name: accepted
+    rejected:
+      name: rejected

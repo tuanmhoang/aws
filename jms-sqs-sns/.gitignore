@@ -27,7 +27,14 @@ hs_err_pid*
 .target
 .project
 .classpath
+*target
 
-# intellij
-.DS_Store
-.idea
+# nodejs
+# Dependency directories
+node_modules/
+# Optional npm cache directory
+.npm
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+# Optional npm cache directory
+.npm
