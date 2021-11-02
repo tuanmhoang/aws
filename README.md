@@ -12,7 +12,10 @@ Intergrate EC2, VPC
 
 ## 2. JMS, SQS, SNS
 
-(In progress)
-
-* Code:  https://github.com/tuanmhoang/aws/tree/jms-sqs-sns/jms-sqs-sns
+* Code BE and services:  https://github.com/tuanmhoang/aws/tree/main/jms-sqs-sns
+* Code FE: https://github.com/tuanmhoang/aws/tree/main/order-ui
 * Notes: https://github.com/tuanmhoang/aws/wiki/JMS,-SQS,-SNS
+
+## 3. API Gateway, Lambda, DynamoDb, S3
+
+(In progress)
