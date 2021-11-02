@@ -10,7 +10,7 @@ Intergrate EC2, VPC
 * Code:  https://github.com/tuanmhoang/aws/tree/main/rest-service
 * Notes: https://github.com/tuanmhoang/aws/wiki/EC2,-VPC,-IAM
 
-## 2. JMS, SQS, SNS
+## 2. JMS, SQS, SNS, S3
 
 * Code BE and services:  https://github.com/tuanmhoang/aws/tree/main/jms-sqs-sns
 * Code FE: https://github.com/tuanmhoang/aws/tree/main/order-ui
