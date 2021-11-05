@@ -21,22 +21,15 @@ public class DataService {
 
     public void updateProduct(ProductRequest req, LambdaLogger logger) {
         UpdateItemSpec updateItemSpec = new UpdateItemSpec().withPrimaryKey("id", req.getId())
-            .withUpdateExpression("set #n = :n, price =:p, imgUrl = :iu")
+            .withUpdateExpression("set #n = :n, price =:p, picture_url = :iu")
             .withNameMap(new NameMap().with("#n", "name")) // name is a special case for DynamoDb
             .withValueMap(new ValueMap().withString(":n", req.getName())
                 .withNumber(":p", req.getPrice())
                 .withString(":iu", req.getImgUrl()))
             .withReturnValues(ReturnValue.UPDATED_NEW);
 
-        UpdateItemOutcome outcome = dynamoDb.getTable(DYNAMODB_TBL_NAME).updateItem(updateItemSpec);
-
+        dynamoDb.getTable(DYNAMODB_TBL_NAME).updateItem(updateItemSpec);
         logger.log("Finish updating...");
-
-        if (outcome.getItem() != null) {
-            logger.log(outcome.getItem().toJSONPretty());
-        } else {
-            logger.log("outcome is null");
-        }
     }
 
 }
