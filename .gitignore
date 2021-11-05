@@ -23,10 +23,10 @@
 hs_err_pid*
 
 # eclipse
-.settings/
-.target
-.project
-.classpath
+*.settings/
+*target/
+*.project
+*.classpath
 
 # intellij
 .DS_Store

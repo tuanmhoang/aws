@@ -14,41 +14,15 @@ import java.util.List;
 
 public class DataService {
 
-    private static final String DYNAMODB_TBL_NAME = "tbl_product";
-
-    //private DynamoDB dynamoDbClient = initDynamoDbClient();
-
     private static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
 
-    public List<Product> getItems(LambdaLogger logger) {
-        logger.log("Loading db...[0]");
-        DynamoDBMapper mapper = new DynamoDBMapper(client);
-        logger.log("Loading db...[1]");
-        // Change to your Table_Name (you can load dynamically from lambda env as well)
-//        DynamoDBMapperConfig mapperConfig = new DynamoDBMapperConfig.Builder().withTableNameOverride(
-//            DynamoDBMapperConfig.TableNameOverride.withTableNameReplacement(DYNAMODB_TBL_NAME)).build();
-//
-//        DynamoDBMapper mapper = new DynamoDBMapper(client, mapperConfig);
+    private DynamoDBMapper mapper = new DynamoDBMapper(client);
 
+    public List<Product> getProducts(LambdaLogger logger) {
+        logger.log("Loading db...");
         DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
-        logger.log("Loading db...[2]");
-        // Change to your model class
         List<Product> scanResult = mapper.scan(Product.class, scanExpression);
-        logger.log("Loading db...[3]");
-        // Check the count and iterate the list and perform as desired.
-        scanResult.size();
-        logger.log("Loading db...[4]");
-        scanResult.forEach(r -> logger.log(r.toString()));
-
-        return null;
+        logger.log("There are " + scanResult.size() + " items found.");
+        return scanResult;
     }
-
-    private DynamoDB initDynamoDbClient() {
-        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
-            .withRegion(Regions.US_EAST_2)
-            .withCredentials(DefaultAWSCredentialsProviderChain.getInstance())
-            .build();
-        return new DynamoDB(client);
-    }
-
 }

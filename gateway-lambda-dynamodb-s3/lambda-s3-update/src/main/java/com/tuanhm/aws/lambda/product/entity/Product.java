@@ -12,7 +12,7 @@ import lombok.Setter;
 @DynamoDBTable(tableName = "tbl_product")
 public class Product {
 
-    private int id;
+    private String id;
 
     private String name;
 
@@ -20,12 +20,12 @@ public class Product {
 
     private String imgUrl;
 
-    @DynamoDBHashKey(attributeName = "Id")
-    public int getId() {
+    @DynamoDBHashKey(attributeName = "id")
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -47,11 +47,11 @@ public class Product {
         this.price = price;
     }
 
+    @DynamoDBAttribute(attributeName = "picture_url")
     public String getImgUrl() {
         return imgUrl;
     }
 
-    @DynamoDBAttribute(attributeName = "imgUrl")
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
     }
