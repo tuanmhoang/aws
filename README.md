@@ -18,4 +18,5 @@ Intergrate EC2, VPC
 
 ## 3. API Gateway, Lambda, DynamoDb, S3
 
-(In progress)
+* Code: https://github.com/tuanmhoang/aws/tree/main/gateway-lambda-dynamodb-s3
+* Notes: https://github.com/tuanmhoang/aws/wiki/API-gateway,-Lambda,-DynamoDb,-S3
